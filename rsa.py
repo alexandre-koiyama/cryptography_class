@@ -175,23 +175,26 @@ if uploaded_encrypted_file is not None and uploaded_private_key is not None:
     # Load private key
     private_key = serialization.load_pem_private_key(private_key_data, password=None)
 
-    # Decrypt the file content
-    decrypted_data = decrypt_file_content(encrypted_file_data, private_key)
-    
-    # Calculate and display SHA-256 hash of the decrypted file
-    decrypted_file_hash = calculate_sha256(decrypted_data)
-    st.text(f"SHA-256 Hash of Decrypted File: {decrypted_file_hash}")
-    
-    # Compare hashes and display result
-    if original_file_hash == decrypted_file_hash:
-        st.text("Success: The decrypted file is identical to the original file.")
-    else:
-        st.text("Error: The decrypted file is corrupted!.")
-    
-    # Download button for decrypted file
-    st.download_button(
-        label="Download Decrypted File",
-        data=decrypted_data,
-        file_name=f"decrypted_file{original_file_extension}",
-        mime="application/octet-stream"
-    )
+    try:
+        # Decrypt the file content
+        decrypted_data = decrypt_file_content(encrypted_file_data, private_key)
+        
+        # Calculate and display SHA-256 hash of the decrypted file
+        decrypted_file_hash = calculate_sha256(decrypted_data)
+        st.text(f"SHA-256 Hash of Decrypted File: {decrypted_file_hash}")
+        
+        # Compare hashes and display result
+        if original_file_hash == decrypted_file_hash:
+            st.text("Success: The decrypted file is identical to the original file.")
+        else:
+            st.text("Error: The decrypted file is corrupted!.")
+
+        # Download button for decrypted file
+        st.download_button(
+            label="Download Decrypted File",
+            data=decrypted_data,
+            file_name=f"decrypted_file{original_file_extension}",
+            mime="application/octet-stream"
+        )
+    except Exception as e:
+        st.error("Error: The private key does not correspond to the encrypted file or the file is corrupted.")
